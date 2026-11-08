@@ -1,0 +1,39 @@
+# Smart Campus Operations Platform - reproducible deployment (docker compose v2)
+x-api: &api
+  build: { context: ., dockerfile: backend/Dockerfile }
+  image: campus-api:1.1.0
+  env_file: .env                       # secrets / demo password: NOT committed (see .env.example)
+  environment:
+    DATABASE_PATH: /data/campus.db
+    INTEGRATION_MODE: simulated
+  volumes: [ "dbdata:/data" ]
+  restart: unless-stopped
+
+services:
+  migrate:                             # one-shot: creates schema + synthetic reference data (idempotent)
+    <<: *api
+    command: ["python", "seed.py"]
+    restart: "no"
+  api1:
+    <<: *api
+    environment: { DATABASE_PATH: /data/campus.db, INTEGRATION_MODE: simulated, INSTANCE_ID: api1 }
+    depends_on: { migrate: { condition: service_completed_successfully } }
+    healthcheck: &hc
+      test: ["CMD", "python", "-c", "import urllib.request,sys; sys.exit(0 if urllib.request.urlopen('http://localhost:5000/api/health').status==200 else 1)"]
+      interval: 5s
+      timeout: 3s
+      retries: 10
+  api2:
+    <<: *api
+    environment: { DATABASE_PATH: /data/campus.db, INTEGRATION_MODE: simulated, INSTANCE_ID: api2 }
+    depends_on: { migrate: { condition: service_completed_successfully } }
+    healthcheck: *hc
+  web:
+    build: { context: ., dockerfile: frontend/Dockerfile }
+    image: campus-web:1.1.0
+    ports: [ "8080:80" ]
+    depends_on: { api1: { condition: service_healthy }, api2: { condition: service_healthy } }
+    restart: unless-stopped
+
+volumes:
+  dbdata:
