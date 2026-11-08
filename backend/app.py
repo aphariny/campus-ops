@@ -58,7 +58,7 @@ def db():
 @contextlib.contextmanager
 def write_tx():
     """BEGIN IMMEDIATE takes the write lock up front: check-then-write sequences become serialised across ALL instances."""
-    c = db()   # perf: skip the explicit transaction
+    c = db(); c.execute("BEGIN IMMEDIATE")
     try:
         yield c
         c.execute("COMMIT")
