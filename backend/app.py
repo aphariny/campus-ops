@@ -57,7 +57,13 @@ def db():
 
 @contextlib.contextmanager
 def write_tx():
-    yield db()          # BASELINE: autocommit, check-then-write is NOT atomic
+    """BEGIN IMMEDIATE takes the write lock up front: check-then-write sequences become serialised across ALL instances."""
+    c = db(); c.execute("BEGIN IMMEDIATE")
+    try:
+        yield c
+        c.execute("COMMIT")
+    except BaseException:
+        c.execute("ROLLBACK"); raise
 
 def audit(c, actor_id, entity, entity_id, action, from_state=None, to_state=None, detail=None):
     c.execute("INSERT INTO audit_events(ts,actor_id,entity,entity_id,action,from_state,to_state,detail) VALUES(?,?,?,?,?,?,?,?)",
@@ -127,7 +133,9 @@ def create_app():
             if d.get(f) in (None, ""): raise ApiError(400, "MISSING_FIELD", f"'{f}' is required", field=f)
 
     def expected_version(d):
-        return d.get("expected_version")
+        v = d.get("expected_version")
+        if not isinstance(v, int): raise ApiError(400, "MISSING_FIELD", "integer 'expected_version' is required", field="expected_version")
+        return v
 
     def sla_state(t, policies):
         if t["status"] in ("resolved", "closed"):
@@ -339,7 +347,7 @@ def create_app():
         with write_tx() as c:
             t = one(c.execute("SELECT * FROM tickets WHERE id=?", (tid,)))
             if not t: raise ApiError(404, "NOT_FOUND", "ticket not found")
-            ev = t["version"]   # BASELINE: last write wins
+            if t["version"] != ev: raise ApiError(409, "STALE_VERSION", "ticket changed since you read it", current_version=t["version"], current_status=t["status"])
             if t["status"] not in ("new", "assigned"): raise ApiError(409, "INVALID_TRANSITION", f"cannot assign a ticket that is '{t['status']}'")
             tech = one(c.execute("SELECT id,role FROM users WHERE id=?", (d["assignee_id"],)))
             if not tech or tech["role"] != "technician": raise ApiError(400, "BAD_ASSIGNEE", "assignee must be a technician")
@@ -365,7 +373,7 @@ def create_app():
             if to == "closed" and not is_mgr: raise ApiError(403, "FORBIDDEN", "only a facility manager or administrator may close a ticket")
             if not is_mgr and not (u["role"] == "technician" and t["assignee_id"] == u["id"]):
                 raise ApiError(403, "FORBIDDEN", "only the assigned technician or a manager may update this ticket")
-            ev = t["version"]   # BASELINE: last write wins
+            if t["version"] != ev: raise ApiError(409, "STALE_VERSION", "ticket changed since you read it", current_version=t["version"], current_status=t["status"])
             if to not in TICKET_TRANSITIONS[t["status"]]:
                 raise ApiError(409, "INVALID_TRANSITION", f"'{t['status']}' -> '{to}' is not allowed", allowed=sorted(TICKET_TRANSITIONS[t["status"]]))
             insp = (d.get("inspection_notes") or t["inspection_notes"] or "").strip()
