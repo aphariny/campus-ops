@@ -1,0 +1,7 @@
+S1 overlapping bookings accepted (5 rounds x 16 requests; correct = 5): 63
+S1 double-booked slots created: 58
+S2 booking rows after 10 parallel retries (correct = 1): 10
+S3 tickets after 10 parallel deliveries of one sensor event (correct = 1): 10
+S3 sensor alerts stored (correct = 1): 10
+S4 trials where BOTH conflicting updates were accepted (correct = 0 of 10): 10
+S4 trials with contradictory audit history (correct = 0 of 10): 10

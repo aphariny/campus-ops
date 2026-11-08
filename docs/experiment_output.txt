@@ -1,0 +1,14 @@
+[setup] two API processes: A=:5101 (pid 3152), B=:5102 (pid 3154); shared DB file
+[setup] a token issued by instance A is accepted by instance B: True
+[E1] 20 trials of two simultaneous overlapping requests on different instances -> outcomes {(201, 409)}  (expected only (201, 409))
+[E1] 16-way race for one slot: 1 x 201, 15 x 409, other 0
+[E2] 10 trials of two incompatible simultaneous updates -> (status codes, final version, transitions audited): {((200, 409), 4, 2)}  (expected ((200, 409), 4, 2))
+[E3] same booking retried 10x in parallel (same Idempotency-Key): codes [200, 200, 200, 200, 200, 200, 200, 200, 200, 201] -> rows in DB: 1
+[E3] sensor event DUP-1 delivered 10x in parallel: codes [200, 200, 200, 200, 200, 200, 200, 200, 200, 201] -> alerts: 1, tickets: 1
+[E3] developer-issue creation, first attempt times out: HTTP 504, local link status = pending_retry
+[E3] 8 parallel retries after the timeout: codes [200, 200, 200, 200, 200, 200, 200, 201] -> tracker issues: 1, links: 1, final link status: linked
+[E4] instance A killed (SIGKILL): A unreachable=True; B still serves GET -> 200
+[E4] 40 booking submissions while A was down and being restarted: 40/40 succeeded; served by ['B']; rows created: 40 (expected 40), distinct keys: 40
+[E4] after restart: A health=A, total bookings 62 (was 22 before kill, +40), old session token still valid on restarted A: True
+[E5] bounded load: 30 concurrent clients x 20 requests = 600 requests over 2 instances in 1.5s -> 391 req/s; latency ms p50=23 p95=206 p99=851 max=1197; unexpected errors=0
+[invariants] bookings=182, tickets=11, audit rows=254; overlapping active bookings=0; duplicate idempotency keys=0; duplicate ticket source refs=0; booking-create audit rows=182 (== bookings: True)
