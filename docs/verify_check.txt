@@ -1,0 +1,4 @@
+PASS booking survived restart  [served by verify]
+PASS sensor-generated ticket survived restart  [served by verify]
+PASS audit history survived restart  [1 booking audit rows]
+ALL CHECKS PASSED

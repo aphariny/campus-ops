@@ -1,0 +1,32 @@
+shot 01_login
+1: Threshold breached → ticket #1 created
+shot 02_sensor_ticket_created
+1b: Duplicate event ignored – existing ticket #1 reused
+shot 03_duplicate_event_ignored
+shot 04_ticket_triage_assign
+2: Ticket assigned
+3a: Ticket updated
+3b: INTEGRATION_TIMEOUT: issue tracker did not respond; local record kept, retrying is safe
+shot 05_integration_timeout_pending_retry
+3c: Linked issue created (or already existed)
+3d (no resolution notes): NOTES_REQUIRED: resolution notes are required
+shot 06_rejected_missing_resolution_notes
+3e: Ticket updated
+4a: DELIVERY_NOT_VERIFIED: linked developer issue is not verified as delivered
+shot 07_close_blocked_until_delivery_verified
+4b: Tracker issue marked released
+4c: Delivery verified
+4d: Ticket updated
+shot 08_ticket_closed_audit_history
+5a: Restricted facility: booking is awaiting approval
+5b: OVERLAP: facility already reserved for an overlapping slot
+shot 09_overlap_rejected
+5c: FORBIDDEN: students may not book restricted facilities
+shot 10_student_denied_restricted
+5d: Booking submitted
+shot 11_calendar_with_booking
+5e (loan): Loan requested
+5f: JUSTIFICATION_REQUIRED: a justification of at least 10 characters is required (auditable decision)
+5g: Decision recorded
+shot 12_approvals
+shot 13_dashboard

@@ -1,0 +1,6 @@
+PASS booking accepted (201) or replayed (200)  [HTTP 201 via verify]
+PASS retry with same key returns the same booking  [id 1 via verify]
+PASS overlapping booking by another user rejected (409 OVERLAP)
+PASS sensor breach creates exactly one ticket; duplicate delivery reuses it  [ticket 1]
+PASS student cannot assign tickets (403)
+ALL CHECKS PASSED
