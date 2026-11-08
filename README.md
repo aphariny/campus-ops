@@ -1,4 +1,4 @@
 # Smart Campus Operations Platform
 
-Status: v1.0.0 baseline - single-instance assumptions
-Run: python backend/seed.py && python backend/dev_server.py
+Status: v1.1.0-rc1 - containerised (docker compose, two API instances)
+Run: docker compose up --build
