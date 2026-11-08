@@ -1,0 +1,21 @@
+:root{--bg:#f4f6fa;--card:#fff;--ink:#1c2430;--mut:#667085;--pri:#1f4e9c;--ok:#18794e;--warn:#b54708;--bad:#b42318;--line:#d9dee7}
+*{box-sizing:border-box}body{margin:0;font:14px/1.45 system-ui,Segoe UI,Arial,sans-serif;background:var(--bg);color:var(--ink)}
+header{display:flex;align-items:center;gap:16px;background:var(--pri);color:#fff;padding:10px 20px;flex-wrap:wrap}
+header h1{font-size:18px;margin:0}nav{display:flex;gap:4px;flex:1;flex-wrap:wrap}
+nav button{background:transparent;color:#fff;border:0;padding:6px 12px;border-radius:6px;cursor:pointer}
+nav button.on,nav button:hover{background:rgba(255,255,255,.2)}#who{font-size:13px}
+#banner{padding:0 20px}.msg{margin:10px 0 0;padding:8px 12px;border-radius:6px;border:1px solid}
+.msg.err{background:#fef3f2;color:var(--bad);border-color:#fda29b}.msg.ok{background:#ecfdf3;color:var(--ok);border-color:#a6f4c5}
+main{padding:16px 20px;max-width:1200px;margin:auto}
+.card{background:var(--card);border:1px solid var(--line);border-radius:10px;padding:14px;margin-bottom:14px}
+.grid{display:grid;gap:12px;grid-template-columns:repeat(auto-fit,minmax(170px,1fr))}
+.kpi b{display:block;font-size:26px}.kpi span{color:var(--mut)}
+table{width:100%;border-collapse:collapse}th,td{text-align:left;padding:7px 8px;border-bottom:1px solid var(--line);vertical-align:top}th{color:var(--mut);font-weight:600;font-size:12px;text-transform:uppercase}
+input,select,textarea,button.btn{font:inherit;padding:6px 8px;border:1px solid var(--line);border-radius:6px}
+button.btn{background:var(--pri);color:#fff;border-color:var(--pri);cursor:pointer}button.btn.alt{background:#fff;color:var(--pri)}button.btn.bad{background:var(--bad);border-color:var(--bad)}
+.row{display:flex;gap:8px;flex-wrap:wrap;align-items:end;margin:6px 0}label{display:flex;flex-direction:column;font-size:12px;color:var(--mut);gap:2px}
+.pill{display:inline-block;padding:1px 8px;border-radius:999px;font-size:12px;border:1px solid var(--line);background:#f2f4f7}
+.on_track,.met,.approved,.confirmed,.completed,.closed,.linked,.delivered{background:#ecfdf3;color:var(--ok);border-color:#a6f4c5}
+.at_risk,.requested,.pending_work,.pending_retry,.in_use{background:#fffaeb;color:var(--warn);border-color:#fedf89}
+.breached,.cancelled,.critical{background:#fef3f2;color:var(--bad);border-color:#fda29b}.small{font-size:12px;color:var(--mut)}
+.login{max-width:360px;margin:60px auto}.flow{display:flex;gap:6px;align-items:center;flex-wrap:wrap}
